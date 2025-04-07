@@ -11,3 +11,9 @@ $MESS['SALE_HPS_JUSAN_RETURN_URL'] = 'URL успешного возврата';
 $MESS['SALE_HPS_JUSAN_RETURN_URL_DESC'] = 'URL для перенаправления клиента в случае успешной оплаты';
 $MESS['SALE_HPS_JUSAN_CANCEL_URL'] = 'URL отмены';
 $MESS['SALE_HPS_JUSAN_CANCEL_URL_DESC'] = 'URL для перенаправления клиента в случае отмены оплаты';
+
+$MESS['SALE_HANDLERS_PAY_SYSTEM_JUSAN_DESCRIPTION'] = '';
+$MESS['SALE_HANDLERS_PAY_SYSTEM_JUSAN_BUTTON_PAID'] = 'Оплатить';
+$MESS['SALE_HANDLERS_PAY_SYSTEM_JUSAN_ERROR_CONFIG'] = 'Ошибка конфигурации';
+$MESS['SALE_HANDLERS_PAY_SYSTEM_JUSAN_PAYMENT_INFO'] = '';
+
