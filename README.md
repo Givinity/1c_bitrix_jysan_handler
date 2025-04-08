@@ -1,4 +1,4 @@
-# Invoice Handler for Bitrix CMS
+# Jysan Handler for Bitrix CMS
 
 ## Описание
 
