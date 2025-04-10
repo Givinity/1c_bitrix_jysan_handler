@@ -45,7 +45,7 @@ class JusanHandler extends PaySystem\ServiceHandler implements PaySystem\IRefund
         $descriptor = $this->getBusinessValue($payment, 'JUSAN_DESCRIPTOR') ?: 'Mebelschik.kz';
 
         // Формирование уникального идентификатора заказа для платежной системы
-        $paymentOrderId = $orderId . '_' . $paymentId;
+		$paymentOrderId = $orderId . "10001" . $paymentId;
 
         // Формирование параметров платежа для передачи в систему Jusan - согласно документации
         $paymentParams = [
@@ -263,12 +263,6 @@ class JusanHandler extends PaySystem\ServiceHandler implements PaySystem\IRefund
      * @param Payment $payment
      * @return string
      */
-    /**
-     * URL для отмены платежа
-     *
-     * @param Payment $payment
-     * @return string
-     */
     private function getCancelUrl(Payment $payment)
     {
         // Пытаемся получить URL из настроек платежной системы
@@ -402,7 +396,54 @@ class JusanHandler extends PaySystem\ServiceHandler implements PaySystem\IRefund
     {
         $result = new ServiceResult();
 
-        // Проверка подписи
+        // Проверяем, является ли запрос redirect=true (пользователь был перенаправлен на order.php)
+        $isRedirect = $request->get('redirect') === 'true';
+        
+        // Если это редирект, то скорее всего это GET-запрос с результатом платежа
+        if ($isRedirect) {
+            // В этом случае мы обрабатываем параметры из GET, но не проверяем подпись
+            // так как браузер пользователя перенаправлен на нашу страницу order.php
+            
+            // Получаем код результата
+            $resCode = $request->get('res_code');
+            $rrn = $request->get('rrn') ?: '';
+            $orderId = $request->get('order') ?: '';
+            
+            if ($resCode === '0') {
+                // Успешная операция для GET-редиректа
+                $result->setOperationType(ServiceResult::MONEY_COMING);
+                $result->setPsData([
+                    'PS_INVOICE_ID' => $orderId,
+                    'PS_STATUS' => 'Y',
+                    'PS_STATUS_CODE' => $resCode,
+                    'PS_STATUS_DESCRIPTION' => $request->get('res_desc') ?? 'Payment successful',
+                    'PS_STATUS_MESSAGE' => 'Payment completed. RRN: ' . $rrn,
+                    'PS_SUM' => $request->get('amount') ?? $payment->getSum(),
+                    'PS_CURRENCY' => $request->get('currency') ?? $payment->getField('CURRENCY'),
+                    'PS_RESPONSE_DATE' => new DateTime()
+                ]);
+                
+                // После обработки GET-параметров мы должны перенаправить пользователя на страницу успешной оплаты
+                // Это происходит в контроллере, который вызывает processRequest, а здесь мы просто обрабатываем параметры
+            } else {
+                // Неуспешная операция для GET-редиректа
+                $errorMessage = $request->get('res_desc') ?? 'Payment failed';
+                $result->addError(new Error($errorMessage));
+                
+                $result->setPsData([
+                    'PS_INVOICE_ID' => $orderId,
+                    'PS_STATUS' => 'N',
+                    'PS_STATUS_CODE' => $resCode,
+                    'PS_STATUS_DESCRIPTION' => $errorMessage,
+                    'PS_STATUS_MESSAGE' => 'Payment failed',
+                    'PS_RESPONSE_DATE' => new DateTime()
+                ]);
+            }
+            
+            return $result;
+        }
+        
+        // Для POST-запросов (фоновые callback-и от банка) выполняем стандартную проверку подписи
         if (!$this->checkRequestSignature($request, $payment)) {
             $result->addError(new Error('Invalid signature'));
             return $result;
@@ -497,7 +538,7 @@ class JusanHandler extends PaySystem\ServiceHandler implements PaySystem\IRefund
      */
     public static function getIndicativeFields()
     {
-        return ['order', 'merchant', 'sign'];
+        return ['order', 'merchant', 'sign', 'redirect'];
     }
 
     /**
@@ -506,8 +547,17 @@ class JusanHandler extends PaySystem\ServiceHandler implements PaySystem\IRefund
      */
     protected static function isMyResponseExtended(Request $request)
     {
+		// Минимальное логирование вызова функции
+    $logData = 'called';
+    
+    file_put_contents($_SERVER['DOCUMENT_ROOT'].'/test/payment_log.txt', $logData, FILE_APPEND);
+
         // Определяем, относится ли запрос к нашей платежной системе
-        return $request->get('order') !== null && $request->get('sign') !== null;
+        // Обрабатываем как callback-запросы, так и GET-редиректы
+        $isCallback = $request->get('order') !== null && $request->get('sign') !== null;
+        $isRedirect = $request->get('redirect') === 'true' && $request->get('order') !== null;
+        
+        return $isCallback || $isRedirect;
     }
 
     /**

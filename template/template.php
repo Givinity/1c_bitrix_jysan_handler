@@ -18,9 +18,26 @@ $paymentId = $params['PAYMENT_ID'] ?? '';
 $orderId = $params['ORDER_ID'] ?? '';
 ?>
 
+
+
+<?if($_GET['res_code'] !== '0') {?>
 <div class="sale-payment-jusan-form-container">
+	<?if($_GET['res_code'] !== '0' and !empty($_GET['res_desc'])) {?>
+	<?$resDesc = urldecode($_GET['res_desc']);?>
+	<div class="jusan-payment-error">
+		<h3><?=Loc::getMessage('JUSAN_PAYMENT_ERROR_HEADER')?></h3>
+		<div class="alert alert-danger">
+			<?=htmlspecialcharsbx($resDesc ?? $params['ERROR_MESSAGE'])?>
+		</div>
+	   <br>
+		<a href="/personal/profile/orders/" class="btn btn-primary">
+			<?=Loc::getMessage('JUSAN_RETURN_TO_ORDERS')?>
+		</a>
+	</div>
+	<?}?>
     <div class="sale-payment-jusan-description">
-        <?= Loc::getMessage('SALE_HANDLERS_PAY_SYSTEM_JUSAN_DESCRIPTION') ?>
+        <?=Loc::getMessage('JUSAN_PAYMENT_ORDER_NUMBER')?>: <?=$params['ORDER_ID']?><br>
+        <?=Loc::getMessage('JUSAN_PAYMENT_ID')?>: <?=$params['PAYMENT_ID']?>
     </div>
 
     <?php if ($paymentUrl && !empty($paymentParams)): ?>
@@ -56,6 +73,79 @@ $orderId = $params['ORDER_ID'] ?? '';
             ]) ?></p>
     </div>
 </div>
+<?}?>
+
+<?if($_GET['res_code'] === '0') {?>
+
+<div class="jusan-payment-success">
+    <div class="alert alert-success">
+        <h3><?=Loc::getMessage('JUSAN_PAYMENT_SUCCESS')?></h3>
+    </div>
+    
+    <div class="payment-details">
+        <p><strong><?=Loc::getMessage('JUSAN_ORDER_NUMBER')?>:</strong> <?=$params['ORDER_ID']?></p>
+        <p><strong><?=Loc::getMessage('JUSAN_PAYMENT_AMOUNT')?>:</strong> <?=$params['AMOUNT']?> <?=$params['CURRENCY']?></p>
+
+        <?php if (!empty($params['RRN'])): ?>
+            <p><strong><?=Loc::getMessage('JUSAN_PAYMENT_RRN')?>:</strong> <?=$params['RRN']?></p>
+        <?php endif; ?>
+    </div>
+    
+    <div class="actions">
+        <a href="/personal/profile/orders/" class="btn btn-primary">
+            <?=Loc::getMessage('JUSAN_RETURN_TO_ORDERS')?>
+        </a>
+        <a href="/" class="btn btn-default">
+            <?=Loc::getMessage('JUSAN_RETURN_TO_HOME')?>
+        </a>
+    </div>
+</div>
+
+<style>
+.jusan-payment-success {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+.payment-details {
+    margin-bottom: 20px;
+}
+.payment-details p {
+    margin: 10px 0;
+}
+.actions {
+    margin-top: 20px;
+}
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-right: 10px;
+}
+.btn-primary {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+.btn-default {
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+</style>
+
+<?}?>
 
 <style type="text/css">
     .sale-payment-jusan-form-container {

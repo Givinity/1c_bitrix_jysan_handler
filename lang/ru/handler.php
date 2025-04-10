@@ -17,3 +17,18 @@ $MESS['SALE_HANDLERS_PAY_SYSTEM_JUSAN_BUTTON_PAID'] = 'Оплатить';
 $MESS['SALE_HANDLERS_PAY_SYSTEM_JUSAN_ERROR_CONFIG'] = 'Ошибка конфигурации';
 $MESS['SALE_HANDLERS_PAY_SYSTEM_JUSAN_PAYMENT_INFO'] = '';
 
+
+$MESS['JUSAN_INVALID_SIGNATURE'] = 'Недействительная подпись платежа';
+$MESS['JUSAN_PAYMENT_FAILED'] = 'Ошибка при выполнении платежа';
+$MESS['JUSAN_PAYMENT_ERROR_HEADER'] = 'Ошибка оплаты';
+$MESS['JUSAN_PAYMENT_ORDER_NUMBER'] = 'Номер заказа';
+$MESS['JUSAN_PAYMENT_ID'] = 'Идентификатор платежа';
+$MESS['JUSAN_RETURN_TO_ORDERS'] = 'Вернуться к списку заказов';
+
+$MESS['JUSAN_PAYMENT_SUCCESS'] = 'Оплата успешно завершена!';
+$MESS['JUSAN_ORDER_NUMBER'] = 'Номер заказа';
+$MESS['JUSAN_PAYMENT_AMOUNT'] = 'Сумма оплаты';
+$MESS['JUSAN_PAYMENT_DATE'] = 'Дата и время оплаты';
+$MESS['JUSAN_PAYMENT_RRN'] = 'Номер транзакции (RRN)';
+$MESS['JUSAN_RETURN_TO_ORDERS'] = 'Вернуться к моим заказам';
+$MESS['JUSAN_RETURN_TO_HOME'] = 'На главную страницу';
